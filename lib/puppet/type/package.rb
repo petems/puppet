@@ -239,6 +239,45 @@ module Puppet
       end
     end
 
+    newparam(:pkgname) do
+      desc "The package name to stop conflicts.  This allows you to have to
+          packages with the same name but different providers:
+
+          package { 'memcached':
+              ensure => installed,
+              provider => gem,
+          }
+
+          package { 'memcached':
+              ensure => installed,
+              provider => apt,
+          }
+
+          will fail with an error because package 'memcached' already exists.
+
+          So you can use pkgname:
+
+          package { 'memcached-gem':
+              ensure   => installed,
+              pkgname  => 'memcached'
+              provider => gem,
+          }
+
+          package { 'memcached':
+              ensure   => installed,
+              pkgname  => 'memcached'
+              provider => apt,
+          }
+
+      "
+
+      validate do |value|
+        if !value.is_a?(String)
+          raise ArgumentError, "Pkgname must be a String not #{value.class}"
+        end
+      end
+    end
+
     newproperty(:package_settings, :required_features=>:package_settings) do
       desc "Settings that can change the contents or configuration of a package.
 
